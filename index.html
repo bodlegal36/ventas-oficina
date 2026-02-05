@@ -1,206 +1,63 @@
 <!DOCTYPE html>
 <html lang="es">
 <head>
-<meta charset="UTF-8">
-<title>Bodegón Legal</title>
-<meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta charset="UTF-8">
+  
+  <title>Bodegón Legal</title>
+<h2>🏛️ Bodegón Legal</h2>
 
-<style>
-body {
-  font-family: Arial, sans-serif;
-  background: linear-gradient(180deg,#0d1b2a,#000);
-  color:#fff;
-  padding:12px;
-  max-widths
-  max-width:480px;
-  margin:auto;
-}
-
-h2, h3 {
-  text-align:center;
-}
-
-.card {
-  background:#1b263b;
-  padding:12px;
-  margin:10px 0;
-  border-radius:10px;
-}
-
-.categoria {
-  margin-top:20px;
-  font-weight:bold;
-  color:#4caf50;
-}
-
-button {
-  width:100%;
-  padding:8px;
-  margin-top:6px;
-  border:none;
-  border-radius:6px;
-  background:#4caf50;
-  font-weight:bold;
-  cursor:pointer;
-}
-
-button.small {
-  width:auto;
-  padding:4px 8px;
-  font-size:12px;
-  background:#e53935;
-}
-
-input {
-  width:100%;
-  padding:8px;
-  margin-top:6px;
-  border-radius:6px;
-  border:none;
-}
-
-.total {
-  font-size:18px;
-  margin-top:10px;
-  text-align:right;
-}
-
-.logo {
-  text-align:center;
-  margin-bottom:10px;
-}
-
-.logo img {
-  max-width:140px;
-}
-</style>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="stylesheet" href="style.css">
 </head>
-
 <body>
 
-<div class="logo">
-  <!-- Si subes logo a GitHub, pon aquí la ruta -->
-  <!-- <img src="logo.png"> -->
-  <h2>⚖️ Bodegón Legal</h2>
-</div>
+  <!-- HEADER -->
+  <header class="header">
+    <div class="header-left">
+      <img src="logo.png" class="logo">
+      <span class="title">Dulcería Oficina</span>
+    </div>
+    <div class="header-right">
+      🛒 <span id="total">$0</span>
+    </div>
+  </header>
 
-<div id="productos">Cargando productos...</div>
+  <!-- PRODUCTOS -->
+  <main class="products">
 
-<h3>🛒 Carrito</h3>
-<div id="carrito" class="card">Vacío</div>
+    <div class="card">
+      <h3>🍫 Super 8</h3>
+      <p class="price">$500</p>
+      <button onclick="addItem(500)">Agregar</button>
+    </div>
 
-<h3>📋 Datos del cliente</h3>
-<div class="card">
-  <input id="cliente" placeholder="Nombre">
-  <input id="telefono" placeholder="Teléfono">
-</div>
+    <div class="card">
+      <h3>🍬 Gomitas</h3>
+      <p class="price">$700</p>
+      <button onclick="addItem(700)">Agregar</button>
+    </div>
 
-<button onclick="enviar()">Enviar pedido</button>
+    <div class="card">
+      <h3>🥤 Bebida</h3>
+      <p class="price">$1.200</p>
+      <button onclick="addItem(1200)">Agregar</button>
+    </div>
+
+  </main>
+
+  <!-- FOOTER CARRITO -->
+  <footer class="footer">
+    <button class="send">Enviar pedido</button>
+  </footer>
 
 <script>
-const API = "https://script.google.com/macros/s/AKfycbzD87gDIjgSMOD_rw0RnC3eKzc4CbzdWstHi2O9jsQsTqyXiNdY0ZoG3x0N2WYn9pgewQ/exec";
-const TOKEN = "OFICINA2026";
-
-const productosDiv = document.getElementById("productos");
-const carritoDiv = document.getElementById("carrito");
-
-let carrito = [];
-let productosPorCategoria = {};
-
-/* ===== CARGAR PRODUCTOS ===== */
-fetch(`${API}?action=productos&token=${TOKEN}`)
-  .then(r => r.json())
-  .then(data => {
-    productosDiv.innerHTML = "";
-    productosPorCategoria = {};
-
-    data.forEach(p => {
-      if (p.stock <= 0) return;
-
-      if (!productosPorCategoria[p.categoria]) {
-        productosPorCategoria[p.categoria] = [];
-      }
-      productosPorCategoria[p.categoria].push(p);
-    });
-
-    for (let cat in productosPorCategoria) {
-      productosDiv.innerHTML += `<div class="categoria">${cat}</div>`;
-
-      productosPorCategoria[cat].forEach(p => {
-        productosDiv.innerHTML += `
-          <div class="card">
-            <b>${p.nombre}</b><br>
-            $${p.precio}<br>
-            <small>Stock: ${p.stock}</small>
-            <button onclick='agregar(${p.id},"${p.nombre}",${p.precio})'>
-              ➕ Agregar
-            </button>
-          </div>`;
-      });
-    }
-  });
-
-/* ===== CARRITO ===== */
-function agregar(id, nombre, precio) {
-  carrito.push({ id, nombre, precio });
-  renderCarrito();
-}
-
-function quitar(i) {
-  carrito.splice(i,1);
-  renderCarrito();
-}
-
-function renderCarrito() {
-  if (!carrito.length) {
-    carritoDiv.innerHTML = "Vacío";
-    return;
-  }
-
   let total = 0;
-  carritoDiv.innerHTML = "";
 
-  carrito.forEach((p,i) => {
-    total += p.precio;
-    carritoDiv.innerHTML += `
-      ${p.nombre} - $${p.precio}
-      <button class="small" onclick="quitar(${i})">✖</button><br>`;
-  });
-
-  carritoDiv.innerHTML += `<div class="total">Total: $${total}</div>`;
-}
-
-/* ===== ENVIAR PEDIDO ===== */
-function enviar() {
-  const cliente = document.getElementById("cliente").value.trim();
-  const telefono = document.getElementById("telefono").value.trim();
-
-  if (!carrito.length) return alert("Carrito vacío");
-  if (!cliente) return alert("Ingrese nombre");
-
-  if (!/^\d{8,12}$/.test(telefono))
-    return alert("Teléfono inválido");
-
-  const total = carrito.reduce((s,p) => s + p.precio, 0);
-
-  const data = {
-    cliente,
-    telefono,
-    items: carrito,
-    total
-  };
-
-  fetch(`${API}?action=pedido&token=${TOKEN}&data=${encodeURIComponent(JSON.stringify(data))}`)
-    .then(r => r.json())
-    .then(res => {
-      alert("Pedido enviado ✔\nID: " + res.pedido_id);
-      carrito = [];
-      renderCarrito();
-      location.reload();
-    });
-}
+  function addItem(precio) {
+    total += precio;
+    document.getElementById("total").innerText = "$" + total;
+  }
 </script>
 
 </body>
 </html>
-
