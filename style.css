@@ -1,1 +1,107 @@
+* {
+  box-sizing: border-box;
+  font-family: Arial, Helvetica, sans-serif;
+}
+
+body {
+  margin: 0;
+  background: linear-gradient(to bottom, #dbeafe, #ffffff);
+  padding-top: 70px;
+  padding-bottom: 80px;
+}
+
+/* HEADER */
+.header {
+  position: fixed;
+  top: 0;
+  width: 100%;
+  height: 60px;
+  background: white;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 0 15px;
+  box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+}
+
+.header-left {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.logo {
+  height: 40px;
+}
+
+.title {
+  font-weight: bold;
+  color: #1e3a8a;
+}
+
+.header-right {
+  font-size: 18px;
+  font-weight: bold;
+  color: #1e40af;
+}
+
+/* PRODUCTOS */
+.products {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
+  gap: 15px;
+  padding: 15px;
+}
+
+.card {
+  background: white;
+  border-radius: 12px;
+  padding: 15px;
+  box-shadow: 0 4px 10px rgba(0,0,0,0.08);
+  text-align: center;
+}
+
+.card h3 {
+  margin: 0 0 10px;
+}
+
+.price {
+  font-size: 18px;
+  font-weight: bold;
+  margin-bottom: 10px;
+}
+
+.card button {
+  width: 100%;
+  padding: 10px;
+  border: none;
+  border-radius: 8px;
+  background: #2563eb;
+  color: white;
+  font-size: 16px;
+}
+
+.card button:active {
+  background: #1e40af;
+}
+
+/* FOOTER */
+.footer {
+  position: fixed;
+  bottom: 0;
+  width: 100%;
+  background: white;
+  padding: 10px;
+  box-shadow: 0 -2px 5px rgba(0,0,0,0.1);
+}
+
+.send {
+  width: 100%;
+  padding: 14px;
+  font-size: 18px;
+  background: #1e40af;
+  color: white;
+  border: none;
+  border-radius: 10px;
+}
 
