@@ -47,7 +47,7 @@ fetch(`${API}?action=productos&token=${TOKEN}`)
    data.forEach(p => {
       cont.innerHTML += `
         <div class="card">
-          ${p.imagen ? `<img src="${p.imagen}" class="prod-img">` : ""}
+          ${p.imagen ? `<img src="${p.imagen}" class="product-img">` : ""}
           <h3>${p.nombre}</h3>
           <p class="price">$${p.precio}</p>
           <button onclick="addItem(${p.id}, '${p.nombre}', ${p.precio})">
