@@ -44,15 +44,10 @@ fetch(`${API}?action=productos&token=${TOKEN}`)
     const cont = document.getElementById("products");
     cont.innerHTML = "";
 
-    if (!data.length) {
-      cont.innerHTML = "❌ No hay productos con stock";
-      return;
-    }
-
-    data.forEach(p => {
+   data.forEach(p => {
       cont.innerHTML += `
         <div class="card">
-          <img src="${p.imagen}" class="product-img" onerror="this.style.display='none'">
+          ${p.imagen ? `<img src="${p.imagen}" class="prod-img">` : ""}
           <h3>${p.nombre}</h3>
           <p class="price">$${p.precio}</p>
           <button onclick="addItem(${p.id}, '${p.nombre}', ${p.precio})">
@@ -62,11 +57,11 @@ fetch(`${API}?action=productos&token=${TOKEN}`)
       `;
     });
   })
-  .catch(err => {
-    console.error(err);
+  .catch(() => {
     document.getElementById("products").innerText =
-      "❌ Error cargando productos";
+      "❌ No se pudieron cargar los productos";
   });
+
 
 /* ================= AGREGAR AL CARRITO ================= */
 function addItem(id, nombre, precio) {
