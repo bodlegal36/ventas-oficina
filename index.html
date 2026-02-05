@@ -20,26 +20,8 @@
 </header>
 
 <!-- PRODUCTOS -->
-<main class="products">
-
-  <div class="card">
-    <h3>🍫 Super 8</h3>
-    <p class="price">$500</p>
-    <button onclick="addItem(1,'Super 8',500)">Agregar</button>
-  </div>
-
-  <div class="card">
-    <h3>🍬 Gomitas</h3>
-    <p class="price">$700</p>
-    <button onclick="addItem(2,'Gomitas',700)">Agregar</button>
-  </div>
-
-  <div class="card">
-    <h3>🥤 Bebida</h3>
-    <p class="price">$1200</p>
-    <button onclick="addItem(3,'Bebida',1200)">Agregar</button>
-  </div>
-
+<main class="products" id="products">
+  Cargando productos...
 </main>
 
 <!-- FOOTER -->
@@ -48,10 +30,38 @@
 </footer>
 
 <script>
-/* ===== CARRITO ===== */
+/* ================= CONFIG ================= */
+const API = "https://script.google.com/macros/s/TU_SCRIPT/exec";
+const TOKEN = "OFICINA2026";
+
+/* ================= CARRITO ================= */
 let carrito = [];
 
-/* ===== AGREGAR ===== */
+/* ================= CARGAR PRODUCTOS ================= */
+fetch(`${API}?action=productos&token=${TOKEN}`)
+  .then(r => r.json())
+  .then(data => {
+    const cont = document.getElementById("products");
+    cont.innerHTML = "";
+
+    data.forEach(p => {
+      cont.innerHTML += `
+        <div class="card">
+          <h3>${p.nombre}</h3>
+          <p class="price">$${p.precio}</p>
+          <button onclick="addItem(${p.id}, '${p.nombre}', ${p.precio})">
+            Agregar
+          </button>
+        </div>
+      `;
+    });
+  })
+  .catch(() => {
+    document.getElementById("products").innerText =
+      "❌ No se pudieron cargar los productos";
+  });
+
+/* ================= AGREGAR AL CARRITO ================= */
 function addItem(id, nombre, precio) {
   const item = carrito.find(p => p.id === id);
 
@@ -64,7 +74,7 @@ function addItem(id, nombre, precio) {
   renderTotal();
 }
 
-/* ===== TOTAL ===== */
+/* ================= TOTAL ================= */
 function renderTotal() {
   const total = carrito.reduce(
     (sum, p) => sum + p.precio * p.cantidad, 0
@@ -72,30 +82,40 @@ function renderTotal() {
   document.getElementById("total").innerText = "$" + total;
 }
 
-/* ===== ENVIAR ===== */
+/* ================= ENVIAR PEDIDO ================= */
 function enviarPedido() {
   if (!carrito.length) {
     alert("🛒 El carrito está vacío");
     return;
   }
 
-  // por ahora solo mostramos el resumen
-  let resumen = "Pedido:\n\n";
-  carrito.forEach(p => {
-    resumen += `${p.nombre} x${p.cantidad} = $${p.precio * p.cantidad}\n`;
-  });
+  const cliente = prompt("Nombre del cliente:");
+  if (!cliente) return;
+
+  const telefono = prompt("Teléfono:");
+  if (!telefono) return;
 
   const total = carrito.reduce(
     (sum, p) => sum + p.precio * p.cantidad, 0
   );
 
-  resumen += `\nTotal: $${total}`;
+  const data = {
+    cliente,
+    telefono,
+    items: carrito,
+    total
+  };
 
-  alert(resumen);
-
-  // reset (temporal)
-  carrito = [];
-  renderTotal();
+  fetch(
+    `${API}?action=pedido&token=${TOKEN}&data=${encodeURIComponent(JSON.stringify(data))}`
+  )
+    .then(r => r.json())
+    .then(res => {
+      alert("✅ Pedido enviado\nID: " + res.pedido_id);
+      carrito = [];
+      renderTotal();
+    })
+    .catch(() => alert("❌ Error enviando pedido"));
 }
 </script>
 
