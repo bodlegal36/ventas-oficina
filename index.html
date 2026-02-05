@@ -2,62 +2,103 @@
 <html lang="es">
 <head>
   <meta charset="UTF-8">
-  
   <title>Bodegón Legal</title>
-<h2>🏛️ Bodegón Legal</h2>
-
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <link rel="stylesheet" href="style.css">
 </head>
 <body>
 
-  <!-- HEADER -->
-  <header class="header">
-    <div class="header-left">
-      <img src="logo.png" class="logo">
-      <span class="title">Un gustico en tu Oficina</span>
-    </div>
-    <div class="header-right">
-      🛒 <span id="total">$0</span>
-    </div>
-  </header>
+<!-- HEADER -->
+<header class="header">
+  <div class="header-left">
+    <img src="logo.png" class="logo">
+    <span class="title">Un gustico en tu Oficina</span>
+  </div>
+  <div class="header-right">
+    🛒 <span id="total">$0</span>
+  </div>
+</header>
 
-  <!-- PRODUCTOS -->
-  <main class="products">
+<!-- PRODUCTOS -->
+<main class="products">
 
-    <div class="card">
-      <h3>🍫 Super 8</h3>
-      <p class="price">$500</p>
-      <button onclick="addItem(500)">Agregar</button>
-    </div>
+  <div class="card">
+    <h3>🍫 Super 8</h3>
+    <p class="price">$500</p>
+    <button onclick="addItem(1,'Super 8',500)">Agregar</button>
+  </div>
 
-    <div class="card">
-      <h3>🍬 Gomitas</h3>
-      <p class="price">$700</p>
-      <button onclick="addItem(700)">Agregar</button>
-    </div>
+  <div class="card">
+    <h3>🍬 Gomitas</h3>
+    <p class="price">$700</p>
+    <button onclick="addItem(2,'Gomitas',700)">Agregar</button>
+  </div>
 
-    <div class="card">
-      <h3>🥤 Bebida</h3>
-      <p class="price">$1.200</p>
-      <button onclick="addItem(1200)">Agregar</button>
-    </div>
+  <div class="card">
+    <h3>🥤 Bebida</h3>
+    <p class="price">$1200</p>
+    <button onclick="addItem(3,'Bebida',1200)">Agregar</button>
+  </div>
 
-  </main>
+</main>
 
-  <!-- FOOTER CARRITO -->
-  <footer class="footer">
-    <button class="send">Enviar pedido</button>
-  </footer>
+<!-- FOOTER -->
+<footer class="footer">
+  <button class="send" onclick="enviarPedido()">Enviar pedido</button>
+</footer>
 
 <script>
-  let total = 0;
+/* ===== CARRITO ===== */
+let carrito = [];
 
-  function addItem(precio) {
-    total += precio;
-    document.getElementById("total").innerText = "$" + total;
+/* ===== AGREGAR ===== */
+function addItem(id, nombre, precio) {
+  const item = carrito.find(p => p.id === id);
+
+  if (item) {
+    item.cantidad++;
+  } else {
+    carrito.push({ id, nombre, precio, cantidad: 1 });
   }
+
+  renderTotal();
+}
+
+/* ===== TOTAL ===== */
+function renderTotal() {
+  const total = carrito.reduce(
+    (sum, p) => sum + p.precio * p.cantidad, 0
+  );
+  document.getElementById("total").innerText = "$" + total;
+}
+
+/* ===== ENVIAR ===== */
+function enviarPedido() {
+  if (!carrito.length) {
+    alert("🛒 El carrito está vacío");
+    return;
+  }
+
+  // por ahora solo mostramos el resumen
+  let resumen = "Pedido:\n\n";
+  carrito.forEach(p => {
+    resumen += `${p.nombre} x${p.cantidad} = $${p.precio * p.cantidad}\n`;
+  });
+
+  const total = carrito.reduce(
+    (sum, p) => sum + p.precio * p.cantidad, 0
+  );
+
+  resumen += `\nTotal: $${total}`;
+
+  alert(resumen);
+
+  // reset (temporal)
+  carrito = [];
+  renderTotal();
+}
 </script>
 
 </body>
 </html>
+
