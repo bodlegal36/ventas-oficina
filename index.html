@@ -1,124 +1,134 @@
 <!DOCTYPE html>
 <html lang="es">
 <head>
-  <meta charset="UTF-8">
-  <title>Bodegón Legal</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <link rel="stylesheet" href="style.css">
+<meta charset="UTF-8">
+<title>Bodegón Legal – Pedidos</title>
+
+<style>
+body {
+  font-family: Arial, sans-serif;
+  background: #f4f4f4;
+  margin: 0;
+  padding: 20px;
+}
+
+h1 {
+  text-align: center;
+  color: #222;
+}
+
+.productos {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+  gap: 15px;
+  margin-top: 20px;
+}
+
+.card {
+  background: white;
+  padding: 15px;
+  border-radius: 10px;
+  box-shadow: 0 2px 6px rgba(0,0,0,0.15);
+}
+
+.card h3 {
+  margin: 0 0 5px;
+}
+
+.categoria {
+  font-size: 13px;
+  color: #666;
+}
+
+.precio {
+  font-size: 18px;
+  font-weight: bold;
+  margin: 10px 0;
+}
+
+.stock {
+  font-size: 13px;
+  color: green;
+}
+
+button {
+  width: 100%;
+  padding: 8px;
+  border: none;
+  background: #c62828;
+  color: white;
+  font-size: 14px;
+  border-radius: 6px;
+  cursor: pointer;
+}
+
+button:hover {
+  background: #a91f1f;
+}
+
+#estado {
+  margin-top: 20px;
+  text-align: center;
+  color: #c62828;
+}
+</style>
 </head>
+
 <body>
 
-<!-- HEADER -->
-<header class="header">
-  <div class="header-left">
-    <img src="logo.png" class="logo">
-    <span class="title">Un gustico en tu Oficina</span>
-  </div>
-  <div class="header-right">
-    🛒 <span id="total">$0</span>
-  </div>
-</header>
+<h1>🍷 Bodegón Legal</h1>
 
-<!-- PRODUCTOS -->
-<main class="products" id="products">
-  Cargando productos...
-</main>
-
-<!-- FOOTER -->
-<footer class="footer">
-  <button class="send" onclick="enviarPedido()">Enviar pedido</button>
-</footer>
+<div id="estado"></div>
+<div class="productos" id="productos"></div>
 
 <script>
-/* ================= CONFIG ================= */
-const API = "https://script.google.com/macros/s/TU_SCRIPT/exec";
 const TOKEN = "OFICINA2026";
-
-/* ================= CARRITO ================= */
-let carrito = [];
+const API_URL = "PEGA_AQUI_TU_URL_DEL_APPS_SCRIPT";
 
 /* ================= CARGAR PRODUCTOS ================= */
-fetch(`${API}?action=productos&token=${TOKEN}`)
-  .then(r => r.json())
-  .then(data => {
-    const cont = document.getElementById("products");
-    cont.innerHTML = "";
+async function cargarProductos() {
+  try {
+    const res = await fetch(`${API_URL}?action=productos&token=${TOKEN}`);
+    const data = await res.json();
+
+    if (!Array.isArray(data)) {
+      document.getElementById("estado").innerText = "Error cargando productos";
+      return;
+    }
+
+    const contenedor = document.getElementById("productos");
+    contenedor.innerHTML = "";
 
     data.forEach(p => {
-      cont.innerHTML += `
-        <div class="card">
-          <h3>${p.nombre}</h3>
-          <p class="price">$${p.precio}</p>
-          <button onclick="addItem(${p.id}, '${p.nombre}', ${p.precio})">
-            Agregar
-          </button>
-        </div>
+      const div = document.createElement("div");
+      div.className = "card";
+      div.innerHTML = `
+        <h3>${p.nombre}</h3>
+        <div class="categoria">${p.categoria}</div>
+        <div class="precio">$${p.precio}</div>
+        <div class="stock">Stock: ${p.stock}</div>
+        <button onclick="agregar('${p.id}','${p.nombre}',${p.precio})">
+          Agregar
+        </button>
       `;
+      contenedor.appendChild(div);
     });
-  })
-  .catch(() => {
-    document.getElementById("products").innerText =
-      "❌ No se pudieron cargar los productos";
-  });
 
-/* ================= AGREGAR AL CARRITO ================= */
-function addItem(id, nombre, precio) {
-  const item = carrito.find(p => p.id === id);
-
-  if (item) {
-    item.cantidad++;
-  } else {
-    carrito.push({ id, nombre, precio, cantidad: 1 });
+  } catch (err) {
+    document.getElementById("estado").innerText =
+      "No se pudieron cargar los productos";
+    console.error(err);
   }
-
-  renderTotal();
 }
 
-/* ================= TOTAL ================= */
-function renderTotal() {
-  const total = carrito.reduce(
-    (sum, p) => sum + p.precio * p.cantidad, 0
-  );
-  document.getElementById("total").innerText = "$" + total;
+function agregar(id, nombre, precio) {
+  alert(`Producto agregado:\n${nombre}\n$${precio}`);
 }
 
-/* ================= ENVIAR PEDIDO ================= */
-function enviarPedido() {
-  if (!carrito.length) {
-    alert("🛒 El carrito está vacío");
-    return;
-  }
-
-  const cliente = prompt("Nombre del cliente:");
-  if (!cliente) return;
-
-  const telefono = prompt("Teléfono:");
-  if (!telefono) return;
-
-  const total = carrito.reduce(
-    (sum, p) => sum + p.precio * p.cantidad, 0
-  );
-
-  const data = {
-    cliente,
-    telefono,
-    items: carrito,
-    total
-  };
-
-  fetch(
-    `${API}?action=pedido&token=${TOKEN}&data=${encodeURIComponent(JSON.stringify(data))}`
-  )
-    .then(r => r.json())
-    .then(res => {
-      alert("✅ Pedido enviado\nID: " + res.pedido_id);
-      carrito = [];
-      renderTotal();
-    })
-    .catch(() => alert("❌ Error enviando pedido"));
-}
+cargarProductos();
 </script>
 
 </body>
 </html>
+
 
