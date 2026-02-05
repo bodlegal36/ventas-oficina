@@ -12,7 +12,7 @@
 <header class="header">
   <div class="header-left">
     <img src="logo.png" class="logo">
-    <span class="title">Un gustico en tu Oficina</span>
+    <span class="title">Un gustico en la Oficina</span>
   </div>
   <div class="header-right">
     🛒 <span id="total">$0</span>
@@ -31,7 +31,7 @@
 
 <script>
 /* ================= CONFIG ================= */
-const API = "https://script.google.com/macros/s/TU_SCRIPT/exec"; // ← TU URL REAL
+const API = "https://script.google.com/macros/s/AKfycbxF5h9_jkQW1lmdqM36cY2GPqB9oeS_KEfmYi7zl257UwRAFJ7vUflCA7voSmhQIsAT/exec";
 const TOKEN = "OFICINA2026";
 
 /* ================= CARRITO ================= */
@@ -41,22 +41,20 @@ let carrito = [];
 fetch(`${API}?action=productos&token=${TOKEN}`)
   .then(r => r.json())
   .then(data => {
-
-    if (!Array.isArray(data)) {
-      throw new Error("Respuesta inválida");
-    }
-
     const cont = document.getElementById("products");
     cont.innerHTML = "";
+
+    if (!data.length) {
+      cont.innerHTML = "❌ No hay productos con stock";
+      return;
+    }
 
     data.forEach(p => {
       cont.innerHTML += `
         <div class="card">
           <h3>${p.nombre}</h3>
-          <small>${p.categoria}</small>
           <p class="price">$${p.precio}</p>
-          <small>Stock: ${p.stock}</small>
-          <button onclick="addItem('${p.id}', '${p.nombre}', ${p.precio})">
+          <button onclick="addItem(${p.id}, '${p.nombre}', ${p.precio})">
             Agregar
           </button>
         </div>
@@ -66,7 +64,7 @@ fetch(`${API}?action=productos&token=${TOKEN}`)
   .catch(err => {
     console.error(err);
     document.getElementById("products").innerText =
-      "❌ No se pudieron cargar los productos";
+      "❌ Error cargando productos";
   });
 
 /* ================= AGREGAR AL CARRITO ================= */
@@ -114,15 +112,9 @@ function enviarPedido() {
     total
   };
 
-  fetch(
-    `${API}?action=pedido&token=${TOKEN}&data=${encodeURIComponent(JSON.stringify(data))}`
-  )
+  fetch(`${API}?action=pedido&token=${TOKEN}&data=${encodeURIComponent(JSON.stringify(data))}`)
     .then(r => r.json())
     .then(res => {
-      if (res.status !== "ok") {
-        throw new Error("Error servidor");
-      }
-
       alert("✅ Pedido enviado\nID: " + res.pedido_id);
       carrito = [];
       renderTotal();
