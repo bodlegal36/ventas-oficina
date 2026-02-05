@@ -111,5 +111,12 @@ body {
   margin-bottom: 8px;
   border-radius: 8px;
 }
+.product-img {
+  width: 60px;       /* tamaño pequeño */
+  height: 60px;
+  object-fit: contain; /* 🔥 clave anti-deformación */
+  display: block;
+  margin: 0 auto 8px;
+}
 
 
