@@ -31,7 +31,7 @@
 
 <script>
 /* ================= CONFIG ================= */
-const API = "https://script.google.com/macros/s/TU_SCRIPT/exec";
+const API = "https://script.google.com/macros/s/TU_SCRIPT/exec"; // ← TU URL REAL
 const TOKEN = "OFICINA2026";
 
 /* ================= CARRITO ================= */
@@ -41,6 +41,11 @@ let carrito = [];
 fetch(`${API}?action=productos&token=${TOKEN}`)
   .then(r => r.json())
   .then(data => {
+
+    if (!Array.isArray(data)) {
+      throw new Error("Respuesta inválida");
+    }
+
     const cont = document.getElementById("products");
     cont.innerHTML = "";
 
@@ -48,15 +53,18 @@ fetch(`${API}?action=productos&token=${TOKEN}`)
       cont.innerHTML += `
         <div class="card">
           <h3>${p.nombre}</h3>
+          <small>${p.categoria}</small>
           <p class="price">$${p.precio}</p>
-          <button onclick="addItem(${p.id}, '${p.nombre}', ${p.precio})">
+          <small>Stock: ${p.stock}</small>
+          <button onclick="addItem('${p.id}', '${p.nombre}', ${p.precio})">
             Agregar
           </button>
         </div>
       `;
     });
   })
-  .catch(() => {
+  .catch(err => {
+    console.error(err);
     document.getElementById("products").innerText =
       "❌ No se pudieron cargar los productos";
   });
@@ -111,6 +119,10 @@ function enviarPedido() {
   )
     .then(r => r.json())
     .then(res => {
+      if (res.status !== "ok") {
+        throw new Error("Error servidor");
+      }
+
       alert("✅ Pedido enviado\nID: " + res.pedido_id);
       carrito = [];
       renderTotal();
@@ -121,4 +133,3 @@ function enviarPedido() {
 
 </body>
 </html>
-
