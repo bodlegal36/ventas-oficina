@@ -1,0 +1,149 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<title>Ventas Oficina</title>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+
+<style>
+body {
+  font-family: Arial;
+  background:#111;
+  color:#fff;
+  padding:10px;
+  max-width:480px;
+  margin:auto;
+}
+.card {
+  background:#1f1f1f;
+  padding:12px;
+  margin:10px 0;
+  border-radius:10px;
+}
+input, button {
+  width:100%;
+  padding:8px;
+  margin-top:5px;
+  border-radius:6px;
+  border:none;
+}
+button {
+  background:#4caf50;
+  font-weight:bold;
+  cursor:pointer;
+}
+.small {
+  font-size:12px;
+}
+.total {
+  font-size:18px;
+  margin-top:10px;
+}
+</style>
+</head>
+
+<body>
+
+<h2>🛍 Productos</h2>
+<div id="productos">Cargando...</div>
+
+<h3>🛒 Carrito</h3>
+<div id="carrito" class="card">Vacío</div>
+
+<h3>📋 Datos</h3>
+<div class="card">
+  <input id="cliente" placeholder="Nombre">
+  <input id="telefono" placeholder="Teléfono">
+</div>
+
+<button onclick="enviar()">Enviar pedido</button>
+
+<script>
+const API = "https://script.google.com/macros/s/AKfycbzD87gDIjgSMOD_rw0RnC3eKzc4CbzdWstHi2O9jsQsTqyXiNdY0ZoG3x0N2WYn9pgewQ/exec";
+const TOKEN = "OFICINA2026";
+
+const productosDiv = document.getElementById("productos");
+const carritoDiv = document.getElementById("carrito");
+
+let carrito = [];
+
+/* ===== PRODUCTOS ===== */
+fetch(`${API}?action=productos&token=${TOKEN}`)
+  .then(r => r.json())
+  .then(data => {
+    productosDiv.innerHTML = "";
+    data.forEach(p => {
+      productosDiv.innerHTML += `
+        <div class="card">
+          <b>${p.nombre}</b><br>
+          ${p.categoria}<br>
+          $${p.precio}<br>
+          <button onclick='agregar(${p.id},"${p.nombre}",${p.precio})'>
+            ➕ Agregar
+          </button>
+        </div>`;
+    });
+  });
+
+/* ===== CARRITO ===== */
+function agregar(id, nombre, precio) {
+  carrito.push({ id, nombre, precio });
+  renderCarrito();
+}
+
+function quitar(i) {
+  carrito.splice(i,1);
+  renderCarrito();
+}
+
+function renderCarrito() {
+  if (!carrito.length) {
+    carritoDiv.innerHTML = "Vacío";
+    return;
+  }
+
+  let total = 0;
+  carritoDiv.innerHTML = "";
+
+  carrito.forEach((p,i) => {
+    total += p.precio;
+    carritoDiv.innerHTML += `
+      ${p.nombre} - $${p.precio}
+      <button class="small" onclick="quitar(${i})">✖</button><br>`;
+  });
+
+  carritoDiv.innerHTML += `<div class="total">Total: $${total}</div>`;
+}
+
+/* ===== ENVÍO ===== */
+function enviar() {
+  const cliente = document.getElementById("cliente").value.trim();
+  const telefono = document.getElementById("telefono").value.trim();
+
+  if (!carrito.length) return alert("Carrito vacío");
+  if (!cliente) return alert("Ingrese nombre");
+
+  const tel = /^\d{8,12}$/;
+  if (!tel.test(telefono)) return alert("Teléfono inválido");
+
+  const total = carrito.reduce((s,p) => s + p.precio, 0);
+
+  const data = {
+    cliente,
+    telefono,
+    items: carrito,
+    total
+  };
+
+  fetch(`${API}?action=pedido&token=${TOKEN}&data=${encodeURIComponent(JSON.stringify(data))}`)
+    .then(r => r.json())
+    .then(res => {
+      alert("Pedido enviado ✔\nID: " + res.pedido_id);
+      carrito = [];
+      renderCarrito();
+    });
+}
+</script>
+
+</body>
+</html>
