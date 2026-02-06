@@ -41,19 +41,28 @@ const TOKEN = "OFICINA2026";
 let carrito = [];
 
 /* ================= CARGAR PRODUCTOS ================= */
-fetch(`${API}?action=productos&token=${TOKEN}`)
+fetch(`${API}&action=productos`)
   .then(r => r.json())
   .then(data => {
     const cont = document.getElementById("products");
     cont.innerHTML = "";
 
-   data.forEach(p => {
+    data.forEach(p => {
+      const img = p.imagen
+        ? `<img src="${p.imagen}" alt="${p.nombre}">`
+        : `<img src="https://via.placeholder.com/48">`;
+
       cont.innerHTML += `
         <div class="card">
-          ${p.imagen ? `<img src="${p.imagen}" class="product-img">` : ""}
-          <h3>${p.nombre}</h3>
-          <p class="price">$${p.precio}</p>
-          <button onclick="addItem(${p.id}, '${p.nombre}', ${p.precio})">
+          <div class="product-header">
+            ${img}
+            <h3>${p.nombre}</h3>
+          </div>
+
+          <div class="category">${p.categoria}</div>
+          <div class="price">$${p.precio}</div>
+
+          <button onclick="addItem(${p.id},'${p.nombre}',${p.precio})">
             Agregar
           </button>
         </div>
@@ -61,7 +70,7 @@ fetch(`${API}?action=productos&token=${TOKEN}`)
     });
   })
   .catch(() => {
-    document.getElementById("products").innerText =
+    document.getElementById("products").innerHTML =
       "❌ No se pudieron cargar los productos";
   });
 
