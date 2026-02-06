@@ -15,7 +15,8 @@
     <span class="title">Un gustico en la Oficina</span>
   </div>
   <div class="header-right">
-    🛒 <span id="total">$0</span>
+    🛒 <span id="totalHeader">$0</span>
+
   </div>
 </header>
 
@@ -24,7 +25,7 @@
   Cargando productos...
 </main>
 <div class="total-box">
-  Total: <span id="total">$0</span>
+   Total: <span id="totalFooter">$0</span>
 </div>
   
 <!-- FOOTER -->
@@ -41,7 +42,7 @@ const TOKEN = "OFICINA2026";
 let carrito = [];
 
 /* ================= CARGAR PRODUCTOS ================= */
-fetch(`${API}&action=productos`)
+fetch(`${API}?action=productos`)
   .then(r => r.json())
   .then(data => {
     const cont = document.getElementById("products");
@@ -93,7 +94,8 @@ function renderTotal() {
   const total = carrito.reduce(
     (sum, p) => sum + p.precio * p.cantidad, 0
   );
-  document.getElementById("total").innerText = "$" + total;
+   document.getElementById("totalHeader").innerText = "$" + total;
+  document.getElementById("totalFooter").innerText = "$" + total;
 }
 
 /* ================= ENVIAR PEDIDO ================= */
