@@ -16,7 +16,6 @@
   </div>
   <div class="header-right">
     🛒 <span id="totalHeader">$0</span>
-
   </div>
 </header>
 
@@ -24,10 +23,11 @@
 <main class="products" id="products">
   Cargando productos...
 </main>
+
 <div class="total-box">
-   Total: <span id="totalFooter">$0</span>
+  Total: <span id="totalFooter">$0</span>
 </div>
-  
+
 <!-- FOOTER -->
 <footer class="footer">
   <button class="send" onclick="enviarPedido()">Enviar pedido</button>
@@ -49,23 +49,26 @@ fetch(`${API}?action=productos`)
     cont.innerHTML = "";
 
     data.forEach(p => {
-      const img = p.imagen
-        ? `<img src="${p.imagen}" alt="${p.nombre}">`
-        : `<img src="https://via.placeholder.com/48">`;
+
+      const imgSrc = p.imagen && p.imagen !== ""
+        ? p.imagen
+        : "https://via.placeholder.com/60";
 
       cont.innerHTML += `
         <div class="card">
+
           <div class="product-header">
-            ${img}
-            <h3>${p.nombre}</h3>
+            <img src="${imgSrc}" class="product-img" alt="${p.nombre}">
+            <span class="product-name">${p.nombre}</span>
           </div>
 
           <div class="category">${p.categoria}</div>
           <div class="price">$${p.precio}</div>
 
-          <button onclick="addItem(${p.id},'${p.nombre}',${p.precio})">
+          <button onclick="addItem(${p.id}, '${p.nombre}', ${p.precio})">
             Agregar
           </button>
+
         </div>
       `;
     });
@@ -74,7 +77,6 @@ fetch(`${API}?action=productos`)
     document.getElementById("products").innerHTML =
       "❌ No se pudieron cargar los productos";
   });
-
 
 /* ================= AGREGAR AL CARRITO ================= */
 function addItem(id, nombre, precio) {
@@ -94,7 +96,7 @@ function renderTotal() {
   const total = carrito.reduce(
     (sum, p) => sum + p.precio * p.cantidad, 0
   );
-   document.getElementById("totalHeader").innerText = "$" + total;
+  document.getElementById("totalHeader").innerText = "$" + total;
   document.getElementById("totalFooter").innerText = "$" + total;
 }
 
@@ -135,3 +137,4 @@ function enviarPedido() {
 
 </body>
 </html>
+
