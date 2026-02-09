@@ -107,11 +107,19 @@ function enviarPedido() {
     return;
   }
 
-  const cliente = prompt("Nombre del cliente:");
+  // 👉 leer datos guardados
+  const clienteGuardado = localStorage.getItem("clienteNombre") || "";
+  const telefonoGuardado = localStorage.getItem("clienteTelefono") || "";
+
+  const cliente = prompt("Nombre del cliente:", clienteGuardado);
   if (!cliente) return;
 
-  const telefono = prompt("Teléfono:");
+  const telefono = prompt("Teléfono:", telefonoGuardado);
   if (!telefono) return;
+
+  // 👉 guardar para próximas compras
+  localStorage.setItem("clienteNombre", cliente);
+  localStorage.setItem("clienteTelefono", telefono);
 
   const total = carrito.reduce(
     (sum, p) => sum + p.precio * p.cantidad, 0
@@ -127,6 +135,11 @@ function enviarPedido() {
   fetch(`${API}?action=pedido&token=${TOKEN}&data=${encodeURIComponent(JSON.stringify(data))}`)
     .then(r => r.json())
     .then(res => {
+      if (res.status !== "ok") {
+        alert("❌ Error: " + res.msg);
+        return;
+      }
+
       alert("✅ Pedido enviado\nID: " + res.pedido_id);
       carrito = [];
       renderTotal();
