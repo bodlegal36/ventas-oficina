@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <title>Admin – Pedidos</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <style>
+    body {
+      font-family: Arial;
+      background: #f1f5f9;
+      margin: 0;
+      padding: 10px;
+    }
+
+    h1 {
+      text-align: center;
+    }
+
+    .pedido {
+      background: #fff;
+      border-radius: 10px;
+      padding: 10px;
+      margin-bottom: 10px;
+      box-shadow: 0 2px 5px rgba(0,0,0,.1);
+    }
+
+    .estado {
+      font-weight: bold;
+      color: #2563eb;
+    }
+
+    button {
+      padding: 6px 10px;
+      border: none;
+      border-radius: 6px;
+      background: #16a34a;
+      color: #fff;
+      cursor: pointer;
+      margin-top: 5px;
+    }
+  </style>
+</head>
+<body>
+
+<h1>📦 Pedidos</h1>
+<div id="lista">Cargando...</div>
+
+<script>
+const API = "https://script.google.com/macros/s/AKfycbyqFgcrTyOi5oW0272WFtXABkdGwnEli8pYnzyVxVyx-t3_rhA-o3Qcw8SKHxNY7TKZtA/exec";
+
+fetch(`${API}?action=listarPedidos`)
+  .then(r => r.json())
+  .then(data => {
+    const cont = document.getElementById("lista");
+    cont.innerHTML = "";
+
+    data.forEach(p => {
+      cont.innerHTML += `
+        <div class="pedido">
+          <div><b>ID:</b> ${p.pedido_id}</div>
+          <div><b>Cliente:</b> ${p.cliente}</div>
+          <div><b>Teléfono:</b> ${p.telefono}</div>
+          <div><b>Items:</b> ${p.items}</div>
+          <div><b>Total:</b> $${p.total}</div>
+          <div class="estado">Estado: ${p.estado}</div>
+
+          <button onclick="entregar('${p.pedido_id}')">
+            Marcar entregado
+          </button>
+        </div>
+      `;
+    });
+  })
+  .catch(() => {
+    document.getElementById("lista").innerText =
+      "❌ Error cargando pedidos";
+  });
+
+function entregar(id) {
+  fetch(`${API}?action=cambiarEstado&id=${id}&estado=ENTREGADO`)
+    .then(r => r.json())
+    .then(() => location.reload());
+}
+</script>
+
+</body>
+</html>
