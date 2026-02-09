@@ -30,7 +30,10 @@
 
 <!-- FOOTER -->
 <footer class="footer">
-  <button class="send" onclick="enviarPedido()">Enviar pedido</button>
+  <button id="btnEnviar" class="send" onclick="enviarPedido()">
+  Enviar pedido
+</button>
+
 </footer>
 
 <script>
@@ -101,23 +104,34 @@ function renderTotal() {
 }
 
 /* ================= ENVIAR PEDIDO ================= */
+
+let enviando = false;
+
 function enviarPedido() {
+  if (enviando) return; // 🔒 evita doble click
+
   if (!carrito.length) {
     alert("🛒 El carrito está vacío");
     return;
   }
 
-  // 👉 leer datos guardados
+  const btn = document.getElementById("btnEnviar");
+  enviando = true;
+
+  // 🔒 bloquear botón
+  btn.disabled = true;
+  btn.innerText = "Enviando pedido...";
+
+  // 👉 datos guardados
   const clienteGuardado = localStorage.getItem("clienteNombre") || "";
   const telefonoGuardado = localStorage.getItem("clienteTelefono") || "";
 
   const cliente = prompt("Nombre del cliente:", clienteGuardado);
-  if (!cliente) return;
+  if (!cliente) return resetBoton();
 
   const telefono = prompt("Teléfono:", telefonoGuardado);
-  if (!telefono) return;
+  if (!telefono) return resetBoton();
 
-  // 👉 guardar para próximas compras
   localStorage.setItem("clienteNombre", cliente);
   localStorage.setItem("clienteTelefono", telefono);
 
@@ -137,15 +151,33 @@ function enviarPedido() {
     .then(res => {
       if (res.status !== "ok") {
         alert("❌ Error: " + res.msg);
+        resetBoton();
         return;
       }
 
       alert("✅ Pedido enviado\nID: " + res.pedido_id);
+
       carrito = [];
       renderTotal();
+
+      // 🔒 dejar botón bloqueado definitivamente
+      btn.innerText = "Pedido enviado ✅";
     })
-    .catch(() => alert("❌ Error enviando pedido"));
+    .catch(() => {
+      alert("❌ Error enviando pedido");
+      resetBoton();
+    });
 }
+
+/* 🔄 reactivar botón solo si falla */
+function resetBoton() {
+  const btn = document.getElementById("btnEnviar");
+  enviando = false;
+  btn.disabled = false;
+  btn.innerText = "Enviar pedido";
+}
+
+
 </script>
 
 </body>
